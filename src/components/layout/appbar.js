@@ -1,7 +1,12 @@
 import React from 'react';
-import AppBar from 'material-ui/AppBar';
-import MenuItem from 'material-ui/MenuItem';
-import Drawer from 'material-ui/Drawer';
+import AppBar from '@material-ui/core/AppBar';
+import MenuItem from '@material-ui/core/MenuItem';
+import Drawer from '@material-ui/core/SwipeableDrawer';
+import Toolbar from '@material-ui/core/Toolbar';
+import Typography from '@material-ui/core/Typography';
+import IconButton from '@material-ui/core/IconButton';
+import MenuIcon from '@material-ui/icons/Menu';
+import { withStyles } from '@material-ui/core/styles';
 import { compose } from 'recompose';
 import { connect } from 'react-redux';
 
@@ -14,17 +19,44 @@ import {
 
 import { navigatePageAction } from '../../utils/locationMiddleware';
 
-const MyAppBar = ({ title, toggleMenu }) => (
-  <AppBar
-    title={title}
-    iconClassNameRight="muidocs-icon-navigation-expand-more"
-    onLeftIconButtonClick={() => toggleMenu()}
-  />
+const MyAppBar = ({ title, toggleMenu, classes }) => (
+  <AppBar position="static" color={'primary'}>
+    <Toolbar>
+      <IconButton
+        className={classes.menuButton}
+        color="inherit"
+        onClick={toggleMenu}
+        aria-label="Menu">
+        <MenuIcon />
+      </IconButton>
+      <Typography variant="title" color="inherit" className={classes.flex}>
+        {title}
+      </Typography>
+    </Toolbar>
+  </AppBar>
 );
+
+const styles = {
+  root: {
+    flexGrow: 1
+  },
+  flex: {
+    flex: 1
+  },
+  menuButton: {
+    marginLeft: -12,
+    marginRight: 20
+  }
+};
+
 export const EnhanceAppbar = compose(
-  connect(state => ({ title: titleSelector(state) }), {
-    toggleMenu: toggleMenuAction
-  })
+  connect(
+    state => ({ title: titleSelector(state) }),
+    {
+      toggleMenu: toggleMenuAction
+    }
+  ),
+  withStyles(styles)
 )(MyAppBar);
 
 const MyDrawer = ({
@@ -32,29 +64,47 @@ const MyDrawer = ({
   updateMenuisOpen,
   toggleMenu,
   navigatePage,
-  isOpen
+  isOpen,
+  classes
 }) => (
   <Drawer
     docked={false}
-    width={200}
+    onOpen={() => {}}
     open={isOpen}
-    onRequestChange={open => {
-      updateMenu(open);
+    onClose={() => {
+      updateMenu(false);
     }}>
-    <MenuItem
-      onClick={() => {
-        toggleMenu();
-        navigatePage('/');
-      }}>
-      Home
-    </MenuItem>
+    <div className={classes.drawer}>
+      <MenuItem
+        onClick={() => {
+          toggleMenu();
+          navigatePage('/');
+        }}>
+        Home
+      </MenuItem>
+      <MenuItem
+        onClick={() => {
+          toggleMenu();
+          navigatePage('/setting');
+        }}>
+        Setting
+      </MenuItem>
+    </div>
   </Drawer>
 );
 
 export const EnhanceDrawer = compose(
-  connect(state => ({ isOpen: isOpenMenuSelector(state) }), {
-    toggleMenu: toggleMenuAction,
-    navigatePage: navigatePageAction,
-    updateMenu: updateMenuAction
+  connect(
+    state => ({ isOpen: isOpenMenuSelector(state) }),
+    {
+      toggleMenu: toggleMenuAction,
+      navigatePage: navigatePageAction,
+      updateMenu: updateMenuAction
+    }
+  ),
+  withStyles({
+    drawer: {
+      width: 200
+    }
   })
 )(MyDrawer);
