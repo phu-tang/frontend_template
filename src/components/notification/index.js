@@ -23,14 +23,18 @@ const mapDispatchToProps = (dispatch: Function) => ({
   dispatch,
 });
 
-const mergeProps = (state, { ...actions, dispatch }, own) => ({
+const mergeProps = (state, { dispatch, ...actions }, own) => ({
   ...state,
   ...own,
   ...actions,
   applyAction: () => dispatch(state.action),
 });
 
-const connectToRedux = connect(mapStateToProps, mapDispatchToProps, mergeProps);
+const connectToRedux = connect(
+  mapStateToProps,
+  mapDispatchToProps,
+  mergeProps,
+);
 
 type NotificationPropsType = {
   shouldShowNotification: boolean,
@@ -41,22 +45,20 @@ type NotificationPropsType = {
   applyAction: Function,
 };
 
-const Notification = (
-  {
-    shouldShowNotification,
-    message,
-    label,
-    applyAction,
-    requestTurnOffNotification,
-  }: NotificationPropsType,
-) => (
+const Notification = ({
+  shouldShowNotification,
+  message,
+  label,
+  applyAction,
+  requestTurnOffNotification,
+}: NotificationPropsType) => (
   <Snackbar
     open={shouldShowNotification}
     message={message}
     action={label}
     // onActionTouchTap={applyAction}
     autoHideDuration={2000}
-    onRequestClose={requestTurnOffNotification}
+    onClose={requestTurnOffNotification}
   />
 );
 
